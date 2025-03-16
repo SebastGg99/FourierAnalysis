@@ -19,9 +19,9 @@ conda install root -y
 
 4). Para crear el ejecutable teniendo en cuenta ROOT y las librerías:
 
-g++ -o fourier_analysis fourier_audio_analysis.cpp $(root-config --cflags --glibs) -lfftw3
+g++ -o fourier_analysis FourierAnalysis.cpp $(root-config --cflags --glibs) -lfftw3
 -----------------------------------------------------------------------------------------------------------
 
 5). Para ejecutar el archivo 
 
-./fourier_analysis Audio.wav salida.pdf
+./fourier_analysis Audios graficas.pdf
