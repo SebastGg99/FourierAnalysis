@@ -119,11 +119,11 @@ void analyzeAndSaveToPDF(const string& folderPath, const string& outputPDF) {
 
         // Espectro de frecuencia
         canvas->cd(2);
-        TGraph* graphFFT = new TGraph(N / 2, &freqAxis[0], &magnitude[0]);
+        TGraph* graphFFT = new TGraph(N / 2, &freqAxis[0], &magnitude[0], 0, freqAxis.back());
         graphFFT->SetTitle(("Espectro de Frecuencia: " + file).c_str());
         graphFFT->SetLineColor(4);
         graphFFT->Draw("AL");
-        graphFFT->GetXaxis()->SetLimits(0, freqAxis.back());
+        //graphFFT->GetXaxis()->SetLimits(0, freqAxis.back());
 
         canvas->Print(outputPDF.c_str()); // Guardar en PDF
 
