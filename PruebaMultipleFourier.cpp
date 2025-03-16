@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <cmath>
+#include <vector>
 #include <filesystem>
 #include <fftw3.h>
 #include <TCanvas.h>
@@ -30,6 +30,7 @@ struct WAVHeader {
     int data_size;
 };
 
+// Función para leer un archivo WAV
 vector<double> readWAV(const string& filename, int& sampleRate) {
     ifstream file(filename, ios::binary);
     if (!file.is_open()) {
@@ -54,6 +55,7 @@ vector<double> readWAV(const string& filename, int& sampleRate) {
     return signal;
 }
 
+// Función para analizar múltiples archivos y guardarlos en un único PDF
 void analyzeAndSaveToPDF(const string& folderPath, const string& outputPDF) {
     vector<string> wavFiles;
     for (const auto& entry : fs::directory_iterator(folderPath)) {
@@ -69,7 +71,10 @@ void analyzeAndSaveToPDF(const string& folderPath, const string& outputPDF) {
 
     TApplication app("app", nullptr, nullptr);
     TCanvas* canvas = new TCanvas("Canvas", "Análisis de Audio", 1000, 800);
-    canvas->Print((outputPDF + "[").c_str()); // Abrir PDF
+    canvas->Divide(1, 2);  // Dividir en dos paneles para las gráficas
+
+    // Abrir el PDF para múltiples páginas
+    canvas->SaveAs((outputPDF + "[").c_str());  
 
     for (const auto& file : wavFiles) {
         int sampleRate;
@@ -81,11 +86,12 @@ void analyzeAndSaveToPDF(const string& folderPath, const string& outputPDF) {
             timeAxis[i] = i / double(sampleRate);
         }
 
+        // FFT
         fftw_complex *in, *out;
         fftw_plan plan;
         in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
         out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
-
+        
         for (int i = 0; i < N; i++) {
             in[i][0] = signal[i];
             in[i][1] = 0.0;
@@ -94,6 +100,7 @@ void analyzeAndSaveToPDF(const string& folderPath, const string& outputPDF) {
         plan = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
         fftw_execute(plan);
 
+        // FFT Magnitudes
         vector<double> freqAxis(N / 2);
         vector<double> magnitude(N / 2);
         for (int i = 0; i < N / 2; i++) {
@@ -101,31 +108,34 @@ void analyzeAndSaveToPDF(const string& folderPath, const string& outputPDF) {
             magnitude[i] = sqrt(out[i][0] * out[i][0] + out[i][1] * out[i][1]);
         }
 
-        canvas->Clear();
-        canvas->Divide(1, 2);
-
+        // Forma de onda
         canvas->cd(1);
         TGraph* graphTime = new TGraph(N, &timeAxis[0], &signal[0]);
         graphTime->SetTitle(("Forma de Onda: " + file).c_str());
         graphTime->SetLineColor(2);
         graphTime->Draw("AL");
 
+        // Espectro de frecuencia
         canvas->cd(2);
         TGraph* graphFFT = new TGraph(N / 2, &freqAxis[0], &magnitude[0]);
         graphFFT->SetTitle(("Espectro de Frecuencia: " + file).c_str());
         graphFFT->SetLineColor(4);
-        graphFFT->GetXaxis()->SetLimits(0, 1200);
         graphFFT->Draw("AL");
+        graphFFT->GetXaxis()->SetLimits(0, 1200);
 
-        canvas->Print(outputPDF.c_str());
+        // Guardar la página en el PDF
+        canvas->SaveAs(outputPDF.c_str());
 
+        // Limpiar memoria
         fftw_destroy_plan(plan);
         fftw_free(in);
         fftw_free(out);
     }
 
-    canvas->Print((outputPDF + "]").c_str()); // Cerrar PDF
-    delete canvas;
+    // Cerrar el PDF
+    canvas->SaveAs((outputPDF + "]").c_str());
+
+    cout << "Análisis completado. Resultados guardados en " << outputPDF << endl;
 }
 
 int main(int argc, char* argv[]) {
@@ -135,6 +145,5 @@ int main(int argc, char* argv[]) {
     }
 
     analyzeAndSaveToPDF(argv[1], argv[2]);
-    cout << "Análisis completado. Resultados guardados en " << argv[2] << endl;
     return 0;
 }
