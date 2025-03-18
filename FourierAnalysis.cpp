@@ -56,7 +56,7 @@ vector<double> readWAV(const string& filename, int& sampleRate) {
 }
 
 // Función para analizar archivos WAV y guardar gráficos en un PDF
-void analyzeAndSaveToPDF(const string& folderPath, const string& outputPNG) {
+void analyzeAndSaveToPDF(const string& folderPath, const string& outputPDF) {
     vector<string> wavFiles;
     
     // Buscar archivos .wav en el directorio especificado
@@ -75,7 +75,7 @@ void analyzeAndSaveToPDF(const string& folderPath, const string& outputPNG) {
     canvas->Divide(1, 2);  // Dos paneles para gráficos
 
     // Iniciar PDF con múltiples páginas
-    canvas->SaveAs((outputPNG + "[").c_str());  
+    canvas->SaveAs((outputPDF + "[").c_str());  
 
     for (const auto& file : wavFiles) {
         int sampleRate;
@@ -126,7 +126,7 @@ void analyzeAndSaveToPDF(const string& folderPath, const string& outputPNG) {
         graphFFT->GetXaxis()->SetLimits(0, 1200);
 
         // Guardar la página en el PDF
-        canvas->SaveAs(outputPNG.c_str());
+        canvas->SaveAs(outputPDF.c_str());
 
         // Liberar memoria
         fftw_destroy_plan(plan);
@@ -135,9 +135,9 @@ void analyzeAndSaveToPDF(const string& folderPath, const string& outputPNG) {
     }
 
     // Cerrar el PDF
-    canvas->SaveAs((outputPNG + "]").c_str());
+    canvas->SaveAs((outputPDF + "]").c_str());
 
-    cout << "Análisis completado. Resultados guardados en " << outputPNG << endl;
+    cout << "Análisis completado. Resultados guardados en " << outputPDF << endl;
 }
 
 int main(int argc, char* argv[]) {
