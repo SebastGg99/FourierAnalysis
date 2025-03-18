@@ -107,7 +107,7 @@ void analyzeAndSaveToPDF(const string& folderPath, const string& outputPDF) {
         vector<double> magnitude(N / 2);
         for (int i = 0; i < N / 2; i++) {
             freqAxis[i] = i * sampleRate / double(N);
-            magnitude[i] = sqrt(out[i][0] * out[i][0] + out[i][1] * out[i][1]);
+            magnitude[i] = sqrt(out[i][0] * out[i][0] + out[i][1] * out[i][1])/ 32768.0;
         }
 
         // Gráfico de la forma de onda
