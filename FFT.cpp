@@ -1,3 +1,8 @@
+/* ======================================================
+ * Script 2: Implementación Clásica de la Transformada Rápida de Fourier (FFT)
+ * ======================================================
+ */
+
 #include <iostream>
 #include <vector>
 #include <complex>
